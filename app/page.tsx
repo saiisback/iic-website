@@ -17,18 +17,11 @@ export default function Home() {
         [ IIC TEAM ]
       </div>
       <div
-        className="absolute left-8 top-8 z-10 font-[family-name:var(--font-league-gothic)] text-white md:left-16 md:top-12"
+        className="absolute left-8 top-8 z-10 text-white md:left-16 md:top-12"
         style={{ fontFamily: "var(--font-league-gothic)" }}
       >
-        <div className="flex w-[14rem] justify-between text-7xl leading-[0.85] tracking-tight md:w-[22rem] md:text-9xl">
-          {"COMING".split("").map((c, i) => (
-            <span key={`c-${i}`}>{c}</span>
-          ))}
-        </div>
-        <div className="flex w-[14rem] justify-between text-7xl leading-[0.85] tracking-tight md:w-[22rem] md:text-9xl">
-          {"SOON".split("").map((c, i) => (
-            <span key={`s-${i}`}>{c}</span>
-          ))}
+        <div className="text-7xl leading-[0.85] tracking-tighter md:text-9xl">
+          COMING SOON
         </div>
       </div>
     </section>

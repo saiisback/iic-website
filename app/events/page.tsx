@@ -21,7 +21,7 @@ export default function EventsPage() {
           fill
           preload
           sizes="100vw"
-          className="object-cover object-center"
+          className="object-cover object-[44%_center] md:object-center"
         />
       }
     />

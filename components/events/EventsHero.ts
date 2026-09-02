@@ -10,7 +10,7 @@ export function EventsHero({ heroImage }: { heroImage: ReactNode }) {
     createElement("div", { className: "absolute inset-0" }, heroImage),
     createElement("div", {
       "aria-hidden": "true",
-      className: "absolute inset-0 bg-black/60",
+      className: "pointer-events-none absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-black/80 via-black/45 to-transparent md:h-72",
     }),
     createElement(
       "div",
@@ -18,7 +18,7 @@ export function EventsHero({ heroImage }: { heroImage: ReactNode }) {
       createElement(
         "h1",
         {
-          className: "text-7xl leading-[0.85] tracking-tighter md:text-9xl",
+          className: "text-7xl leading-[0.85] tracking-tighter md:text-8xl lg:text-9xl",
           style: { fontFamily: "var(--font-league-gothic)" },
         },
         "EVENTS",

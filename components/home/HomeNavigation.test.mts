@@ -17,7 +17,7 @@ test("renders the approved placeholder navigation as a vertical stack with four 
       ([, href, label]) => ({ href, label }),
     ),
     [
-      { href: "#events", label: "Events" },
+      { href: "/events", label: "Events" },
       { href: "#gallery", label: "Gallery" },
       { href: "#team", label: "Team" },
       { href: "#idea-box", label: "Idea Box" },

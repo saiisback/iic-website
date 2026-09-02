@@ -8,6 +8,10 @@ export function EventsHero({ heroImage }: { heroImage: ReactNode }) {
       className: "relative min-h-[100dvh] overflow-hidden bg-black text-white",
     },
     createElement("div", { className: "absolute inset-0" }, heroImage),
+    createElement("div", {
+      "aria-hidden": "true",
+      className: "absolute inset-0 bg-black/60",
+    }),
     createElement(
       "div",
       { className: "relative z-10 flex items-start justify-between px-6 pt-6 md:px-16 md:pt-12" },

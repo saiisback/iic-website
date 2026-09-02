@@ -16,5 +16,6 @@ test("renders an accessible Events hero around the builder artwork", () => {
   assert.match(markup, /<h1[^>]*>EVENTS<\/h1>/);
   assert.match(markup, /<a[^>]*href="\/"[^>]*>BACK HOME<\/a>/);
   assert.match(markup, /<img[^>]*alt="Six student builders creating/);
+  assert.match(markup, /<div[^>]*aria-hidden="true"[^>]*bg-black\/60/);
   assert.doesNotMatch(markup, /THE BUILDERS/);
 });

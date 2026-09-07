@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { HomeNavigation } from "./HomeNavigation.ts";
 
-test("renders the approved placeholder navigation as a vertical stack with four links", () => {
+test("renders only the Idea Box placeholder beneath Lock In", () => {
   const markup = renderToStaticMarkup(HomeNavigation());
 
   assert.match(
@@ -16,12 +16,8 @@ test("renders the approved placeholder navigation as a vertical stack with four 
     [...markup.matchAll(/<a[^>]*href="([^"]+)"[^>]*>([^<]+)<\/a>/g)].map(
       ([, href, label]) => ({ href, label }),
     ),
-    [
-      { href: "#events", label: "Events" },
-      { href: "#gallery", label: "Gallery" },
-      { href: "#team", label: "Team" },
-      { href: "#idea-box", label: "Idea Box" },
-    ],
+    [{ href: "/idea-box", label: "Idea Box" }],
   );
+  assert.doesNotMatch(markup, />Events<|>Gallery<|>Team</);
   assert.doesNotMatch(markup, /<a[^>]*class="[^"]*border-b[^"]*"/);
 });

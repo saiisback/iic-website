@@ -16,7 +16,7 @@ test("renders only the Idea Box placeholder beneath Lock In", () => {
     [...markup.matchAll(/<a[^>]*href="([^"]+)"[^>]*>([^<]+)<\/a>/g)].map(
       ([, href, label]) => ({ href, label }),
     ),
-    [{ href: "#idea-box", label: "Idea Box" }],
+    [{ href: "/idea-box", label: "Idea Box" }],
   );
   assert.doesNotMatch(markup, />Events<|>Gallery<|>Team</);
   assert.doesNotMatch(markup, /<a[^>]*class="[^"]*border-b[^"]*"/);

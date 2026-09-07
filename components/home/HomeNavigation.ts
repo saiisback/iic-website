@@ -4,7 +4,7 @@ const navigationItems = [
   // { href: "/events", label: "Events" },
   // { href: "#gallery", label: "Gallery" },
   // { href: "#team", label: "Team" },
-  { href: "#idea-box", label: "Idea Box" },
+  { href: "/idea-box", label: "Idea Box" },
 ] as const;
 
 export function HomeNavigation() {

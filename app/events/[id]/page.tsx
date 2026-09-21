@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { events } from "@/lib/data";
 import { eventImage } from "@/lib/media";
+import { getEventReport } from "@/lib/reports";
+import { EventReport } from "@/components/events/EventReport";
 import { fmtDate, fmtTime } from "@/lib/format";
 
 type EventPageProps = {
@@ -37,6 +39,9 @@ export default async function EventPage({ params }: EventPageProps) {
 
   if (!event) notFound();
 
+  const report = getEventReport(event.id);
+  const cover = report?.cover ?? eventImage(event.id);
+
   const meta = [
     { label: "DATE", value: fmtDate(event.date) },
     { label: "TIME", value: fmtTime(event.date) },
@@ -45,70 +50,79 @@ export default async function EventPage({ params }: EventPageProps) {
   ];
 
   return (
-    <main className="relative min-h-[100dvh] w-full overflow-hidden bg-black text-white">
-      <div className="absolute inset-0">
+    <main className="min-h-[100dvh] w-full bg-black text-white">
+      <section className="relative h-[62vh] min-h-[24rem] w-full overflow-hidden">
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-cover bg-center opacity-40"
-          style={{ backgroundImage: `url(${JSON.stringify(eventImage(event.id))})` }}
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${JSON.stringify(cover)})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/80 to-black" />
-      </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-black" />
 
-      <div className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-5xl flex-col px-6 py-10 md:px-12 md:py-16">
-        <div className="flex items-center justify-between">
-          <Link
-            href="/events"
-            className="border border-white/40 px-4 py-2 text-xs font-medium tracking-[0.24em] text-white transition-[background-color,color] duration-200 hover:bg-white hover:text-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-          >
-            ALL EVENTS
-          </Link>
-          <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50">
-            {event.status === "upcoming" ? "UPCOMING" : "ARCHIVED"}
-          </span>
-        </div>
-
-        <div className="mt-auto pt-16">
-          <p className="font-mono text-[11px] uppercase tracking-[0.4em] text-white/45">
-            {event.code}
-          </p>
-          <h1
-            className="mt-4 text-6xl leading-[0.85] tracking-tighter md:text-8xl lg:text-9xl"
-            style={{ fontFamily: "var(--font-league-gothic)" }}
-          >
-            {event.title}
-          </h1>
-          <p
-            className="mt-3 text-base text-white/60 md:text-lg"
-            style={{ fontFamily: "var(--font-jp)" }}
-          >
-            {event.subtitleJa}
-          </p>
-
-          <dl className="mt-10 grid grid-cols-2 gap-6 border-t border-white/15 pt-8 md:grid-cols-4">
-            {meta.map((item) => (
-              <div key={item.label}>
-                <dt className="font-mono text-[10px] uppercase tracking-[0.25em] text-white/40">
-                  {item.label}
-                </dt>
-                <dd className="mt-2 text-sm text-white md:text-base">{item.value}</dd>
-              </div>
-            ))}
-          </dl>
-
-          <div className="mt-12 flex flex-wrap items-center gap-4">
+        <div className="relative z-10 flex h-full flex-col justify-between p-6 md:p-12">
+          <div className="flex items-start justify-between">
             <Link
-              href="/idea-box"
-              className="bg-white px-6 py-3 text-xs font-medium tracking-[0.3em] text-black transition-transform duration-200 hover:-translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:translate-y-px"
+              href="/events"
+              className="border border-white/45 px-4 py-2 text-xs font-medium tracking-[0.24em] text-white transition-[background-color,color] duration-200 hover:bg-white hover:text-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
-              LOCK IN
+              ALL EVENTS
             </Link>
-            <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/40">
-              Full brief and media coming soon
+            <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/55">
+              {event.status === "upcoming" ? "UPCOMING" : "ARCHIVED"}
             </span>
           </div>
+
+          <div>
+            <p className="font-mono text-[11px] uppercase tracking-[0.4em] text-emerald-300">
+              {event.code}
+            </p>
+            <h1
+              className="mt-3 text-6xl leading-[0.85] tracking-tighter md:text-8xl lg:text-9xl"
+              style={{ fontFamily: "var(--font-league-gothic)" }}
+            >
+              {event.title}
+            </h1>
+            <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.28em] text-white/60">
+              {fmtDate(event.date)} · {event.location}
+            </p>
+          </div>
         </div>
-      </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-6xl px-6 py-14 md:px-12 md:py-20">
+        <dl className="grid grid-cols-2 gap-6 border-b border-white/15 pb-12 md:grid-cols-4">
+          {meta.map((item) => (
+            <div key={item.label}>
+              <dt className="font-mono text-[10px] uppercase tracking-[0.25em] text-white/40">
+                {item.label}
+              </dt>
+              <dd className="mt-2 text-sm text-white md:text-base">{item.value}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <div className="mt-14">
+          {report ? (
+            <EventReport markdown={report.markdown} />
+          ) : (
+            <p className="max-w-prose text-sm leading-relaxed text-white/55">
+              The full report for {event.title} is on its way. Check back soon.
+            </p>
+          )}
+        </div>
+
+        <div className="mt-16 flex flex-wrap items-center gap-4 border-t border-white/15 pt-10">
+          <Link
+            href="/events"
+            className="bg-white px-6 py-3 text-xs font-medium tracking-[0.3em] text-black transition-transform duration-200 hover:-translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:translate-y-px"
+          >
+            BACK TO EVENTS
+          </Link>
+          <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/40">
+            IIC · BICEP TEAM
+          </span>
+        </div>
+      </section>
     </main>
   );
 }

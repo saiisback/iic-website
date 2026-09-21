@@ -35,12 +35,6 @@ export function EventCard({ event }: { event: EventItem }) {
       >
         {event.title}
       </div>
-      <div
-        className="mt-1 text-xs text-[var(--muted)]"
-        style={{ fontFamily: "var(--font-jp)" }}
-      >
-        {event.subtitleJa}
-      </div>
 
       <dl className="mt-4 grid grid-cols-2 gap-2 font-mono text-[10px] uppercase tracking-[0.2em]">
         <div>

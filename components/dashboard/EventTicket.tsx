@@ -20,12 +20,6 @@ export function EventTicket({ event }: { event: EventItem }) {
       >
         {event.title}
       </div>
-      <div
-        className="mt-1 text-[11px] text-[var(--muted)]"
-        style={{ fontFamily: "var(--font-jp)" }}
-      >
-        {event.subtitleJa}
-      </div>
 
       <div className="mt-4 border-t border-dashed border-[var(--wire)] pt-3 font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--muted)]">
         <div className="flex justify-between">

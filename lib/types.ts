@@ -28,7 +28,6 @@ export type EventItem = {
   id: string;
   code: string;
   title: string;
-  subtitleJa: string;
   date: string;
   location: string;
   xpReward: number;

@@ -1,10 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import eventsHero from "@/public/events-builders-hero.png";
-import { EventsHero } from "@/components/events/EventsHero";
-
-const heroAlt =
-  "Six student builders creating with electronics, robotics, code, prototypes, fabrication tools, and product tests";
+import { EventsShowcase } from "@/components/events/EventsShowcase";
 
 export const metadata: Metadata = {
   title: "Events | IIC BMSIT",
@@ -12,18 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function EventsPage() {
-  return (
-    <EventsHero
-      heroImage={
-        <Image
-          src={eventsHero}
-          alt={heroAlt}
-          fill
-          preload
-          sizes="100vw"
-          className="object-cover object-[44%_center] md:object-contain md:object-bottom"
-        />
-      }
-    />
-  );
+  return <EventsShowcase />;
 }

@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { HomeNavigation } from "./HomeNavigation.ts";
 
-test("renders only the Idea Box placeholder beneath Lock In", () => {
+test("renders the Events, Gallery and Idea Box links beneath Lock In", () => {
   const markup = renderToStaticMarkup(HomeNavigation());
 
   assert.match(
@@ -16,8 +16,12 @@ test("renders only the Idea Box placeholder beneath Lock In", () => {
     [...markup.matchAll(/<a[^>]*href="([^"]+)"[^>]*>([^<]+)<\/a>/g)].map(
       ([, href, label]) => ({ href, label }),
     ),
-    [{ href: "/idea-box", label: "Idea Box" }],
+    [
+      { href: "/events", label: "Events" },
+      { href: "/gallery", label: "Gallery" },
+      { href: "/idea-box", label: "Idea Box" },
+    ],
   );
-  assert.doesNotMatch(markup, />Events<|>Gallery<|>Team</);
+  assert.doesNotMatch(markup, />Team</);
   assert.doesNotMatch(markup, /<a[^>]*class="[^"]*border-b[^"]*"/);
 });

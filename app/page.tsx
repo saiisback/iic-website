@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { HomeLockIn } from "@/components/home/HomeLockIn";
 import { HomeNavigation } from "@/components/home/HomeNavigation";
+import { RecruitmentPopup } from "@/components/home/RecruitmentPopup";
 
 export default function Home() {
   return (
@@ -28,6 +29,7 @@ export default function Home() {
           INNOVATE
         </div>
       </div>
+      <RecruitmentPopup />
     </section>
   );
 }

@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=League+Gothic&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap");
 @import "tailwindcss";
 
 :root {
@@ -25,16 +26,16 @@
   --color-wire: var(--wire);
   --color-wire-dark: var(--wire-dark);
   --color-muted: var(--muted);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-league-gothic);
-  --font-jp: var(--font-noto-jp);
+  --font-sans: "Manrope", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+  --font-display: "League Gothic", sans-serif;
+  --font-jp: "Noto Sans JP", sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }
 
 @keyframes ripple {

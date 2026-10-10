@@ -88,7 +88,7 @@
     6px 6px 0 #d8d1c0,
     9px 9px 0 #182439;
   color: var(--gold);
-  font-family: var(--font-geist-mono), monospace;
+  font-family: var(--font-mono);
   text-transform: uppercase;
   transition: transform 360ms cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -204,7 +204,7 @@
 }
 
 .coverMonogram {
-  font-family: var(--font-league-gothic), sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(2.1rem, 7vw, 3.2rem);
   letter-spacing: 0.08em;
   text-indent: 0.08em;
@@ -233,7 +233,7 @@
   display: grid;
   padding-block: 1.15rem 1rem;
   border-block: 1px solid rgba(201, 167, 91, 0.42);
-  font-family: var(--font-league-gothic), sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(2.25rem, 8vw, 3.85rem);
   letter-spacing: 0.035em;
   line-height: 0.82;
@@ -256,7 +256,7 @@
 
 .openHint {
   color: rgba(238, 231, 212, 0.58);
-  font-family: var(--font-geist-mono), monospace;
+  font-family: var(--font-mono);
   font-size: 0.66rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -420,7 +420,7 @@
 .xpBlock span,
 .verificationRow span,
 .verificationRow small {
-  font-family: var(--font-geist-mono), monospace;
+  font-family: var(--font-mono);
   text-transform: uppercase;
 }
 
@@ -443,7 +443,7 @@
   border: 1px solid var(--rust);
   border-radius: 50%;
   color: var(--rust);
-  font-family: var(--font-league-gothic), sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(1.35rem, 3.6vw, 3.1rem);
   letter-spacing: 0.08em;
 }
@@ -467,7 +467,7 @@
   position: relative;
   max-width: 15ch;
   margin-inline: auto;
-  font-family: var(--font-league-gothic), sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(1.4rem, 3.25vw, 3rem);
   font-weight: 400;
   letter-spacing: 0.025em;
@@ -510,7 +510,7 @@
 .identityFields dd,
 .statusMeta dd {
   margin-top: 0.3rem;
-  font-family: var(--font-geist-mono), monospace;
+  font-family: var(--font-mono);
   font-size: clamp(0.48rem, 0.85vw, 0.72rem);
   font-weight: 600;
 }
@@ -529,7 +529,7 @@
 }
 
 .signature small {
-  font-family: var(--font-geist-mono), monospace;
+  font-family: var(--font-mono);
   font-size: clamp(0.35rem, 0.6vw, 0.5rem);
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -586,7 +586,7 @@
 
 .portrait span {
   color: var(--navy);
-  font-family: var(--font-league-gothic), sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(3rem, 8vw, 7.5rem);
   opacity: 0.78;
 }
@@ -594,7 +594,7 @@
 .holderName,
 .pageTitle {
   position: relative;
-  font-family: var(--font-league-gothic), sans-serif;
+  font-family: var(--font-display);
   font-weight: 400;
   letter-spacing: 0.01em;
   line-height: 0.92;
@@ -610,7 +610,7 @@
 .handle {
   margin-top: 0.55rem;
   color: var(--rust);
-  font-family: var(--font-geist-mono), monospace;
+  font-family: var(--font-mono);
   font-size: clamp(0.46rem, 0.85vw, 0.72rem);
   font-weight: 600;
 }
@@ -658,7 +658,7 @@
 }
 
 .statRow strong {
-  font-family: var(--font-league-gothic), sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(1.3rem, 3.6vw, 3.2rem);
   font-weight: 400;
   line-height: 1;
@@ -666,7 +666,7 @@
 
 .statRow span {
   margin-top: 0.3rem;
-  font-family: var(--font-geist-mono), monospace;
+  font-family: var(--font-mono);
   font-size: clamp(0.34rem, 0.62vw, 0.5rem);
   letter-spacing: 0.05em;
   text-align: center;
@@ -696,13 +696,13 @@
 
 .stamp span,
 .stamp small {
-  font-family: var(--font-geist-mono), monospace;
+  font-family: var(--font-mono);
   font-size: clamp(0.36rem, 0.65vw, 0.55rem);
   letter-spacing: 0.12em;
 }
 
 .stamp strong {
-  font-family: var(--font-league-gothic), sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(1.5rem, 3.8vw, 3.3rem);
   letter-spacing: 0.08em;
 }
@@ -775,14 +775,14 @@
 }
 
 .tierSeal span {
-  font-family: var(--font-geist-mono), monospace;
+  font-family: var(--font-mono);
   font-size: clamp(0.4rem, 0.7vw, 0.6rem);
   letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
 .tierSeal strong {
-  font-family: var(--font-league-gothic), sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(1.8rem, 5vw, 4.6rem);
   font-weight: 400;
   letter-spacing: 0.04em;
@@ -802,7 +802,7 @@
 }
 
 .xpBlock strong {
-  font-family: var(--font-league-gothic), sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(1.45rem, 3.8vw, 3.4rem);
   font-weight: 400;
   line-height: 1;
@@ -883,7 +883,7 @@
 
 .verificationRow strong {
   margin: 0.3rem 0;
-  font-family: var(--font-geist-mono), monospace;
+  font-family: var(--font-mono);
   font-size: clamp(0.48rem, 0.9vw, 0.74rem);
 }
 
@@ -893,7 +893,7 @@
   align-items: center;
   gap: 0.8rem;
   color: rgba(238, 231, 212, 0.7);
-  font-family: var(--font-geist-mono), monospace;
+  font-family: var(--font-mono);
   font-size: 0.62rem;
   letter-spacing: 0.14em;
 }

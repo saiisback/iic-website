@@ -23,7 +23,7 @@ export default function Home() {
       </div>
       <div
         className="absolute left-8 top-8 z-10 text-white md:left-16 md:top-12"
-        style={{ fontFamily: "var(--font-league-gothic)" }}
+        style={{ fontFamily: "var(--font-display)" }}
       >
         <div className="text-7xl leading-[0.85] tracking-tighter md:text-9xl">
           INNOVATE

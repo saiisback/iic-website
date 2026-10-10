@@ -24,7 +24,7 @@ export function ComingSoon() {
         {
           className:
             "text-7xl leading-[0.85] tracking-tighter sm:text-8xl md:text-9xl",
-          style: { fontFamily: "var(--font-league-gothic)" },
+          style: { fontFamily: "var(--font-display)" },
         },
         "COMING SOON",
       ),

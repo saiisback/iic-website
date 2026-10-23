@@ -150,8 +150,13 @@ const fragmentShader = `
     if (inImageArea && imageAlpha > 0.0) {
       float atlasSize = ceil(sqrt(uTextureCount));
       vec2 atlasPos = vec2(mod(texIndex, atlasSize), floor(texIndex / atlasSize));
-      vec2 atlasUV = (atlasPos + imageUV) / atlasSize;
-      atlasUV.y = 1.0 - atlasUV.y;
+      // Row-direct sampling with an intra-tile vertical flip: photo top of the
+      // tile data must appear at the top of the image area. (Equivalent to the
+      // historical flipY=true pipeline without relying on a canvas upload flip.)
+      vec2 atlasUV = vec2(
+        atlasPos.x + imageUV.x,
+        atlasPos.y + 1.0 - imageUV.y
+      ) / atlasSize;
       vec3 imageColor = texture2D(uImageAtlas, atlasUV).rgb;
       color = mix(color, imageColor, imageAlpha);
     }
@@ -184,15 +189,15 @@ function rgbaToArray(rgba: string): number[] {
   ];
 }
 
-function createTextTexture(
+function createTextCanvas(
   title: string,
   year: string | number,
   textColor: string,
-): THREE.CanvasTexture {
+): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
   canvas.width = 2048;
   canvas.height = 256;
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
   if (ctx) {
     ctx.clearRect(0, 0, 2048, 256);
     ctx.font = "80px monospace";
@@ -204,28 +209,65 @@ function createTextTexture(
     ctx.textAlign = "right";
     ctx.fillText(String(year), 2048 - 30, 128);
   }
-  const texture = new THREE.CanvasTexture(canvas);
+  return canvas;
+}
+
+const ATLAS_TILE = 512;
+
+// Builds the atlas as a raw RGBA byte array and uploads it via THREE.DataTexture.
+// This deliberately avoids creating the atlas as a 2D canvas and calling
+// texImage2D(canvas): in Chromium (Electron 152 observed) that canvas-snapshot
+// upload path intermittently transfers scrambled or zeroed rows for large
+// canvases (~3584x3584), which renders as randomly-black gallery cells with
+// duplicated/shifted tiles. Copying bytes directly through an ArrayBufferView
+// is a plain memcpy and does not go through the canvas snapshot path.
+function createDataTexture(
+  tiles: Array<ImageData | null>,
+  backgroundAlpha: number,
+): THREE.DataTexture {
+  const atlasSize = Math.ceil(Math.sqrt(tiles.length));
+  const size = atlasSize * ATLAS_TILE;
+  const data = new Uint8Array(size * size * 4);
+  for (let i = 0; i < data.length; i += 4) {
+    data[i + 3] = backgroundAlpha;
+  }
+  tiles.forEach((tile, index) => {
+    const source = tile ?? atlasBlankTile();
+    const y = Math.floor(index / atlasSize) * ATLAS_TILE;
+    const x = (index % atlasSize) * ATLAS_TILE;
+    const atlasRowStride = atlasSize * ATLAS_TILE * 4;
+    const src = source.data;
+    for (let row = 0; row < ATLAS_TILE; row += 1) {
+      const atlasRowStart = (y + row) * atlasRowStride + x * 4;
+      const srcStart = row * ATLAS_TILE * 4;
+      data.set(
+        src.subarray(srcStart, srcStart + ATLAS_TILE * 4),
+        atlasRowStart,
+      );
+    }
+  });
+  const texture = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
   texture.wrapS = THREE.ClampToEdgeWrapping;
   texture.wrapT = THREE.ClampToEdgeWrapping;
-  texture.minFilter = THREE.NearestFilter;
-  texture.magFilter = THREE.NearestFilter;
-  texture.flipY = false;
-  texture.generateMipmaps = false;
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.needsUpdate = true;
   return texture;
 }
 
-function blankTexture(): THREE.CanvasTexture {
-  const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = 512;
-  const ctx = canvas.getContext("2d");
-  if (ctx) {
-    ctx.fillStyle = "#111";
-    ctx.fillRect(0, 0, 512, 512);
+function atlasBlankTile(): ImageData {
+  const tile = new Uint8ClampedArray(ATLAS_TILE * ATLAS_TILE * 4);
+  for (let i = 0; i < tile.length; i += 4) {
+    // Matches the previous "#111" blank tile.
+    tile[i] = 17;
+    tile[i + 1] = 17;
+    tile[i + 2] = 17;
+    tile[i + 3] = 255;
   }
-  return new THREE.CanvasTexture(canvas);
+  return new ImageData(tile, ATLAS_TILE, ATLAS_TILE);
 }
 
-function loadImageTexture(src: string): Promise<THREE.Texture> {
+function loadImageTile(src: string): Promise<ImageData | null> {
   return new Promise((resolve) => {
     const image = new Image();
     if (/^https?:\/\//.test(src)) image.crossOrigin = "anonymous";
@@ -234,54 +276,34 @@ function loadImageTexture(src: string): Promise<THREE.Texture> {
       try {
         await image.decode();
       } catch {}
-      const texture = new THREE.Texture(image);
-      texture.wrapS = THREE.ClampToEdgeWrapping;
-      texture.wrapT = THREE.ClampToEdgeWrapping;
-      texture.minFilter = THREE.LinearFilter;
-      texture.magFilter = THREE.LinearFilter;
-      texture.flipY = false;
-      texture.needsUpdate = true;
-      resolve(texture);
+      try {
+        const tile = document.createElement("canvas");
+        tile.width = tile.height = ATLAS_TILE;
+        const ctx = tile.getContext("2d", { willReadFrequently: true });
+        if (!ctx) return resolve(null);
+        ctx.drawImage(image, 0, 0, ATLAS_TILE, ATLAS_TILE);
+        resolve(ctx.getImageData(0, 0, ATLAS_TILE, ATLAS_TILE));
+      } catch {
+        resolve(null);
+      }
     };
-    image.onerror = () => resolve(blankTexture());
+    image.onerror = () => resolve(null);
     image.src = src;
   });
 }
 
-function createTextureAtlas(
-  textures: THREE.Texture[],
-  isText = false,
-): THREE.CanvasTexture {
-  const atlasSize = Math.ceil(Math.sqrt(textures.length));
-  const textureSize = 512;
-  const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = atlasSize * textureSize;
-  const ctx = canvas.getContext("2d");
-  if (ctx) {
-    if (isText) ctx.clearRect(0, 0, canvas.width, canvas.height);
-    else {
-      ctx.fillStyle = "black";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-    textures.forEach((texture, index) => {
-      const x = (index % atlasSize) * textureSize;
-      const y = Math.floor(index / atlasSize) * textureSize;
-      const src = (texture.source?.data ?? texture.image) as
-        | CanvasImageSource
-        | undefined;
-      if (!src) return;
-      try {
-        ctx.drawImage(src, x, y, textureSize, textureSize);
-      } catch {}
-    });
-  }
-  const atlasTexture = new THREE.CanvasTexture(canvas);
-  atlasTexture.wrapS = THREE.ClampToEdgeWrapping;
-  atlasTexture.wrapT = THREE.ClampToEdgeWrapping;
-  atlasTexture.minFilter = THREE.LinearFilter;
-  atlasTexture.magFilter = THREE.LinearFilter;
-  atlasTexture.flipY = false;
-  return atlasTexture;
+function createTextTile(
+  title: string,
+  year: string | number,
+  textColor: string,
+): ImageData {
+  const textCanvas = createTextCanvas(title, year, textColor);
+  const tile = document.createElement("canvas");
+  tile.width = tile.height = ATLAS_TILE;
+  const ctx = tile.getContext("2d", { willReadFrequently: true });
+  if (!ctx) return atlasBlankTile();
+  ctx.drawImage(textCanvas, 0, 0, ATLAS_TILE, ATLAS_TILE);
+  return ctx.getImageData(0, 0, ATLAS_TILE, ATLAS_TILE);
 }
 
 type SceneProps = {
@@ -316,9 +338,8 @@ function ArtGalleryScene({
       | undefined;
     let geometry: THREE.PlaneGeometry | undefined;
     let material: THREE.ShaderMaterial | undefined;
-    let imageAtlas: THREE.CanvasTexture | undefined;
-    let textAtlas: THREE.CanvasTexture | undefined;
-    const loadedTextures: THREE.Texture[] = [];
+    let imageAtlas: THREE.DataTexture | undefined;
+    let textAtlas: THREE.DataTexture | undefined;
 
     const state = {
       isDragging: false,
@@ -399,7 +420,11 @@ function ArtGalleryScene({
 
     const onPointerDown = (event: PointerEvent) => {
       event.preventDefault();
-      container.setPointerCapture?.(event.pointerId);
+      try {
+        container.setPointerCapture?.(event.pointerId);
+      } catch {
+        // Some synthetic/edge-case pointers cannot be captured; dragging still works.
+      }
       startDrag(event.clientX, event.clientY);
     };
     const onPointerMove = (event: PointerEvent) => {
@@ -427,18 +452,15 @@ function ArtGalleryScene({
     };
 
     const init = async () => {
-      const imageTiles = await Promise.all(images.map((src) => loadImageTexture(src)));
-      if (cancelled) {
-        imageTiles.forEach((texture) => texture.dispose());
-        return;
-      }
-      loadedTextures.push(...imageTiles);
-      const textTextures = items.map((item) =>
-        createTextTexture(item.title, item.year, defaultConfig.textColor),
+      const imageTileData = await Promise.all(images.map((src) => loadImageTile(src)));
+      if (cancelled) return;
+      const textTileData = items.map((item) =>
+        createTextTile(item.title, item.year, defaultConfig.textColor),
       );
-      loadedTextures.push(...textTextures);
-      imageAtlas = createTextureAtlas(imageTiles, false);
-      textAtlas = createTextureAtlas(textTextures, true);
+      // Slot mapping must stay grid row-major, col = i % size (shader indexes
+      // tiles as mod(texIndex, atlasSize), floor(texIndex / atlasSize)).
+      imageAtlas = createDataTexture(imageTileData, 255);
+      textAtlas = createDataTexture(textTileData, 0);
       if (cancelled) return;
 
       const uniforms = {
@@ -485,7 +507,6 @@ function ArtGalleryScene({
       container.removeEventListener("pointercancel", onPointerUp);
       container.removeEventListener("pointerleave", onPointerLeave);
       window.removeEventListener("resize", onResize);
-      loadedTextures.forEach((texture) => texture.dispose());
       imageAtlas?.dispose();
       textAtlas?.dispose();
       geometry?.dispose();

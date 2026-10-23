@@ -59,6 +59,20 @@ export default function AdminDashboard({ initialAuthenticated }: { initialAuthen
     finally { setLoading(false); }
   }
 
+  async function exportExcel() {
+    setError("");
+    try {
+      const response = await fetch("/api/admin/applications/export", { cache: "no-store" });
+      if (response.status === 401) { setAuthenticated(false); setApplications([]); setSelectedId(null); }
+      if (!response.ok) throw new Error((await response.json()).error);
+      const name = /filename="([^"]+)"/.exec(response.headers.get("Content-Disposition") ?? "")?.[1] ?? "iic-career-applications.xlsx";
+      const url = URL.createObjectURL(await response.blob());
+      const link = document.createElement("a");
+      link.href = url; link.download = name; link.click();
+      URL.revokeObjectURL(url);
+    } catch (err) { setError(err instanceof Error ? err.message : "Unable to export applications."); }
+  }
+
   async function logout() {
     setError("");
     try {
@@ -92,7 +106,7 @@ export default function AdminDashboard({ initialAuthenticated }: { initialAuthen
       {error && <p className={styles.error} role="alert">{error}</p>}
       <p className={styles.note}>Private access for the IIC recruitment team.</p>
     </section> : <section className={styles.workspace}>
-      <div className={styles.titleRow}><div><h1>Applications<span>.</span></h1><p>The next generation of ideas, builders, and organizers.</p></div><button disabled={loading} onClick={load}>{loading ? "Refreshing…" : "Refresh applications"}</button></div>
+      <div className={styles.titleRow}><div><h1>Applications<span>.</span></h1><p>The next generation of ideas, builders, and organizers.</p></div><div className={styles.actions}><button disabled={loading} onClick={exportExcel}>Download as Excel</button><button disabled={loading} onClick={load}>{loading ? "Refreshing…" : "Refresh applications"}</button></div></div>
       <div className={styles.tabs} aria-label="Filter by review status">{(["all", "new", "accepted", "rejected"] as const).map((value) => <button key={value} aria-pressed={status === value} onClick={() => setStatus(value)}>{value === "all" ? "All applications" : labels[value]}<span>{applications.filter((item) => value === "all" || item.reviewStatus === value).length}</span></button>)}</div>
       <div className={styles.filters}><label className={styles.search}>Search applicants<input type="search" placeholder="Name, USN, or email" value={search} onChange={(event) => setSearch(event.target.value)} /></label><label>Role<select value={role} onChange={(event) => setRole(event.target.value)}><option value="all">All roles</option>{CAREER_ROLE_TYPES.map((value) => <option key={value}>{value}</option>)}</select></label><label>Sort by<select value={sort} onChange={(event) => setSort(event.target.value)}><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="name">Name A–Z</option></select></label></div>
       {error && <p className={styles.error} role="alert">{error}</p>}

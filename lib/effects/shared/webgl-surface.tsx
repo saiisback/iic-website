@@ -22,9 +22,10 @@ export function useEffectReducedMotion() {
   );
 }
 
-let webglAvailable: boolean | undefined;
-function supportsWebGL() {
-  if (webglAvailable !== undefined) return webglAvailable;
+let webglAvailable: boolean | null = null;
+const availabilityListeners = new Set<() => void>();
+function detectWebglAvailability() {
+  if (webglAvailable !== null) return;
   try {
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("webgl2");
@@ -33,9 +34,16 @@ function supportsWebGL() {
   } catch {
     webglAvailable = false;
   }
-  return webglAvailable;
+  availabilityListeners.forEach((notify) => notify());
 }
-const subscribeAvailability = () => () => {};
+const subscribeAvailability = (notify: () => void) => {
+  // Detection is deferred a tick: context creation can transiently fail during
+  // early page load (common on phones), and the result is sticky, so a false
+  // negative would permanently lock every WebGL surface into its static image.
+  if (webglAvailable === null) setTimeout(detectWebglAvailability, 0);
+  availabilityListeners.add(notify);
+  return () => availabilityListeners.delete(notify);
+};
 
 class SurfaceBoundary extends Component<
   { children: ReactNode; fallback: ReactNode },
@@ -56,6 +64,8 @@ type WebGLSurfaceProps = {
   style?: CSSProperties;
   imageSrc?: string;
   label?: string;
+  /** Extra classes for the static fallback image (e.g. phone adjustments). */
+  fallbackClassName?: string;
 };
 
 export function WebGLSurface({
@@ -64,17 +74,21 @@ export function WebGLSurface({
   style,
   imageSrc,
   label = "ObsidianUI visual effect",
+  fallbackClassName,
 }: WebGLSurfaceProps) {
   const supported = useSyncExternalStore(
     subscribeAvailability,
-    supportsWebGL,
+    () => webglAvailable === true,
     () => false,
   );
   const fallback = (
     <div
       role="img"
       aria-label={label}
-      className="absolute inset-0 bg-cover bg-center"
+      className={cn(
+        "absolute inset-0 bg-cover bg-center",
+        fallbackClassName,
+      )}
       style={{
         backgroundImage: imageSrc ? `url(${JSON.stringify(imageSrc)})` : undefined,
       }}

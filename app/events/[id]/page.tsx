@@ -77,7 +77,7 @@ export default async function EventPage({ params }: EventPageProps) {
               {event.code}
             </p>
             <h1
-              className="mt-3 text-6xl leading-[0.85] tracking-tighter md:text-8xl lg:text-9xl"
+              className="mt-3 text-[clamp(2.75rem,13vw,6rem)] leading-[0.85] tracking-tighter md:text-8xl lg:text-9xl"
               style={{ fontFamily: "var(--font-display)" }}
             >
               {event.title}

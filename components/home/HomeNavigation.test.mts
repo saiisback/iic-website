@@ -27,11 +27,12 @@ test("renders the Events, Gallery, Idea Box and Careers links beneath Lock In", 
   assert.doesNotMatch(markup, /<a[^>]*class="[^"]*border-b[^"]*"/);
 });
 
-test("highlights the Careers link with a pulsing accent", () => {
+test("Careers renders in the quiet nav style while recruitment is closed", () => {
   const markup = renderToStaticMarkup(HomeNavigation());
   const careersAnchor =
     markup.match(/<a[^>]*href="\/careers"[^>]*>[\s\S]*?<\/a>/)?.[0] ?? "";
 
-  assert.match(careersAnchor, /text-emerald-300/);
-  assert.match(careersAnchor, /animate-pulse/);
+  // The pulsing accent only bounces back when RECRUITMENT_OPEN flips to true.
+  assert.doesNotMatch(careersAnchor, /text-emerald-300/);
+  assert.doesNotMatch(careersAnchor, /animate-pulse/);
 });

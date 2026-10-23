@@ -99,6 +99,27 @@ export type SliderItem = {
   img: string;
 };
 
+// Contexts can transiently fail (device limits, many tabs). A failing render
+// keeps the rows working: an inert canvas gets mounted and the interactive
+// scene simply plays its static fallback image instead.
+function createSliderRenderer(): THREE.WebGLRenderer {
+  try {
+    return new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  } catch {
+    const inert = document.createElement("canvas");
+    const noop = () => { };
+    const stub = {
+      domElement: inert,
+      setPixelRatio: noop,
+      setClearColor: noop,
+      setSize: noop,
+      dispose: noop,
+      render: noop,
+    };
+    return stub as unknown as THREE.WebGLRenderer;
+  }
+}
+
 type SliderApi = {
   setActive: (index: number) => void;
   show: (index: number) => void;
@@ -147,7 +168,7 @@ function HoverSliderScene({
       return Math.round(W < 768 ? Math.min(cardW, W * 0.88) : cardW);
     };
 
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    const renderer = createSliderRenderer();
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     renderer.setClearColor(0x000000, 0);
     Object.assign(renderer.domElement.style, {
@@ -397,7 +418,11 @@ function HoverSliderScene({
         }
         syncImageSize(meshes[i]);
 
-        meshes[i].position.set(compact ? W * 0.24 : W * 0.26, posY, i);
+        // Desktop keeps the stack right of the row list; phones centre it and
+        // drop it below the rows so it stays inside the viewport.
+        const centerX = compact ? W * 0.24 : W < 768 ? 0 : W * 0.26;
+        const centerY = !compact && W < 768 ? H * 0.24 : 0;
+        meshes[i].position.set(centerX, posY + centerY, i);
         meshes[i].scale.set(sw, sh, 1);
         meshes[i].rotation.z = 0;
         meshes[i].material.uniforms.uVelocity.value.set(vel.x, vel.y * 0.28);
@@ -657,6 +682,7 @@ type InteractiveHoverSliderProps = {
   className?: string;
   style?: CSSProperties;
   onSelect?: (item: SliderItem, index: number) => void;
+  fallbackClassName?: string;
 };
 
 export function InteractiveHoverSlider({
@@ -666,6 +692,7 @@ export function InteractiveHoverSlider({
   className,
   style,
   onSelect,
+  fallbackClassName,
 }: InteractiveHoverSliderProps = {}) {
   return (
     <WebGLSurface
@@ -673,6 +700,7 @@ export function InteractiveHoverSlider({
       style={style}
       imageSrc={items[0]?.img}
       label="IIC events image showcase"
+      fallbackClassName={fallbackClassName}
     >
       {items.length > 0 && (
         <HoverSliderScene

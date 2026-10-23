@@ -2,6 +2,7 @@ import Image from "next/image";
 import { HomeLockIn } from "@/components/home/HomeLockIn";
 import { HomeNavigation } from "@/components/home/HomeNavigation";
 import { RecruitmentPopup } from "@/components/home/RecruitmentPopup";
+import { RECRUITMENT_OPEN } from "@/lib/careers/status";
 
 export default function Home() {
   return (
@@ -16,20 +17,22 @@ export default function Home() {
           className="object-contain object-bottom"
         />
       </div>
-      <div className="absolute right-5 top-5 z-10 flex flex-col items-end text-sm font-medium tracking-[0.3em] text-white md:right-16 md:top-12 md:text-base">
-        <div>[ IIC TEAM ]</div>
-        <HomeLockIn />
-        <HomeNavigation />
-      </div>
-      <div
-        className="absolute left-8 top-8 z-10 text-white md:left-16 md:top-12"
-        style={{ fontFamily: "var(--font-display)" }}
-      >
-        <div className="text-7xl leading-[0.85] tracking-tighter md:text-9xl">
-          INNOVATE
+      <div className="absolute inset-x-0 top-0 z-10 flex flex-col gap-4 px-5 pt-5 md:flex-row md:items-start md:justify-between md:gap-6 md:px-16 md:pt-12">
+        <div
+          className="order-2 text-white md:order-none"
+          style={{ fontFamily: "var(--font-display)" }}
+        >
+          <div className="text-[clamp(3rem,12vw,9rem)] leading-[0.85] tracking-tighter">
+            INNOVATE
+          </div>
+        </div>
+        <div className="order-1 flex flex-col items-end text-sm font-medium tracking-[0.3em] text-white md:order-none md:text-base">
+          <div>[ IIC TEAM ]</div>
+          <HomeLockIn />
+          <HomeNavigation />
         </div>
       </div>
-      <RecruitmentPopup />
+      {RECRUITMENT_OPEN && <RecruitmentPopup />}
     </section>
   );
 }

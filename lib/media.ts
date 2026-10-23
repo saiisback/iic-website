@@ -57,7 +57,6 @@ const eventPhotoSets: Array<{ eventId: string; photos: string[] }> = [
       "/events/overclock/poster.jpg",
       "/events/overclock/01.png",
       "/events/overclock/02.png",
-      "/events/overclock/03.png",
       "/events/overclock/04.png",
       "/events/overclock/05.jpg",
       "/events/overclock/06.jpg",

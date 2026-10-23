@@ -19,7 +19,7 @@ export default function IdeaBoxPage() {
       <div className="mx-auto grid max-w-[1440px] gap-14 px-5 pb-24 pt-12 md:px-10 md:pt-16 lg:grid-cols-[minmax(18rem,0.72fr)_minmax(0,1.28fr)] lg:gap-20 lg:pt-20 xl:gap-28">
         <aside className="lg:sticky lg:top-12 lg:h-fit">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-emerald-300">Submit what you&apos;re building</p>
-          <h1 className="mt-6 max-w-xl font-display text-[6.5rem] leading-[0.76] tracking-[-0.025em] text-white sm:text-[8rem] lg:text-[9.5rem] xl:text-[11rem]">
+          <h1 className="mt-6 max-w-xl font-display text-[clamp(3.25rem,16vw,8rem)] leading-[0.76] tracking-[-0.025em] text-white lg:text-[clamp(3.25rem,4.8vw,5rem)]">
             IDEA BOX
           </h1>
           <p className="mt-8 max-w-md text-base leading-7 text-white/62 md:text-lg md:leading-8">

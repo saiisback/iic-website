@@ -1,11 +1,12 @@
 import { createElement } from "react";
+import { RECRUITMENT_OPEN } from "@/lib/careers/status";
 
 const navigationItems = [
   { href: "/events", label: "Events" },
   { href: "/gallery", label: "Gallery" },
   // { href: "#team", label: "Team" },
   { href: "/idea-box", label: "Idea Box" },
-  { href: "/careers", label: "Careers", highlight: true },
+  { href: "/careers", label: "Careers", highlight: RECRUITMENT_OPEN },
 ] as const;
 
 const baseLinkClass =

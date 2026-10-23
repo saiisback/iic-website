@@ -7,7 +7,7 @@ export function GalleryShowcase() {
     <section className="relative min-h-[100dvh] w-full overflow-hidden bg-black text-white">
       <div className="flex items-start justify-between px-6 pt-6 md:px-16 md:pt-12">
         <h1
-          className="text-7xl leading-[0.85] tracking-tighter md:text-8xl lg:text-9xl"
+          className="text-[clamp(3rem,11vw,6rem)] leading-[0.85] tracking-tighter md:text-8xl lg:text-9xl"
           style={{ fontFamily: "var(--font-display)" }}
         >
           GALLERY

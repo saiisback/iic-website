@@ -16,7 +16,7 @@ export function EventsShowcase() {
     >
       <div className="flex items-start justify-between px-6 pt-6 md:px-16 md:pt-12">
         <h1
-          className="text-7xl leading-[0.85] tracking-tighter md:text-8xl lg:text-9xl"
+          className="text-[clamp(3rem,11vw,6rem)] leading-[0.85] tracking-tighter md:text-8xl lg:text-9xl"
           style={{ fontFamily: "var(--font-display)" }}
         >
           EVENTS
@@ -38,6 +38,7 @@ export function EventsShowcase() {
           items={eventSlides}
           showHeader={false}
           className="h-[70vh] min-h-[30rem] w-full md:h-[78vh]"
+          fallbackClassName="top-auto h-[62%] opacity-60 max-md:-scale-x-100"
           onSelect={(item) => {
             const event = events.find((entry) => entry.code === item.id);
             if (event) router.push(`/events/${event.id}`);

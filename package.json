@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "tsx --test components/**/*.test.mts lib/**/*.test.mts",
     "db:migrate:ideas": "node scripts/apply-idea-migration.mjs",
-    "db:migrate:careers": "node scripts/apply-career-migration.mjs"
+    "db:migrate:careers": "node scripts/apply-career-migration.mjs",
+    "db:migrate:reviews": "node scripts/apply-review-migration.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

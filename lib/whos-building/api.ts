@@ -1,15 +1,15 @@
-import { saveIdeaSubmission } from "./repository";
-import { validateIdeaSubmission } from "./validation";
+import { saveSubmission } from "./repository";
+import { validateSubmission } from "./validation";
 
 export const MAX_IDEA_PAYLOAD_BYTES = 32_000;
 
-type SaveIdea = typeof saveIdeaSubmission;
+type SaveSubmission = typeof saveSubmission;
 
 function json(body: unknown, status: number) {
   return Response.json(body, { status });
 }
 
-export function createIdeaPostHandler(save: SaveIdea = saveIdeaSubmission) {
+export function createSubmissionPostHandler(save: SaveSubmission = saveSubmission) {
   return async function POST(request: Request): Promise<Response> {
     const declaredLength = Number(request.headers.get("content-length"));
     if (Number.isFinite(declaredLength) && declaredLength > MAX_IDEA_PAYLOAD_BYTES) {
@@ -27,7 +27,7 @@ export function createIdeaPostHandler(save: SaveIdea = saveIdeaSubmission) {
       return json({ ok: false, error: "invalid_json" }, 400);
     }
 
-    const validation = validateIdeaSubmission(parsed);
+    const validation = validateSubmission(parsed);
     if (!validation.ok) {
       return json(
         { ok: false, error: "validation_failed", fieldErrors: validation.fieldErrors },

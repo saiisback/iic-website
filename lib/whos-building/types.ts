@@ -1,4 +1,4 @@
-export const IDEA_DOMAINS = [
+export const PROJECT_DOMAINS = [
   "AI / Machine Learning",
   "FinTech",
   "HealthTech",
@@ -56,7 +56,7 @@ export const SUPPORT_OPTIONS = [
   "IP / Patent guidance",
 ] as const;
 
-export type IdeaDomain = (typeof IDEA_DOMAINS)[number];
+export type ProjectDomain = (typeof PROJECT_DOMAINS)[number];
 export type ProductCategory = (typeof PRODUCT_CATEGORIES)[number];
 export type PrototypeStatus = (typeof PROTOTYPE_STATUSES)[number];
 export type TeamStatus = (typeof TEAM_STATUSES)[number];
@@ -64,7 +64,7 @@ export type TeamSize = (typeof TEAM_SIZES)[number];
 export type CollaboratorChoice = (typeof COLLABORATOR_CHOICES)[number];
 export type SupportNeed = (typeof SUPPORT_OPTIONS)[number];
 
-export interface IdeaDraft {
+export interface SubmissionDraft {
   fullName: string;
   usn: string;
   email: string;
@@ -96,8 +96,8 @@ export interface IdeaDraft {
   website: string;
 }
 
-export interface ValidIdeaSubmission extends Omit<
-  IdeaDraft,
+export interface ValidSubmission extends Omit<
+  SubmissionDraft,
   | "domain"
   | "productCategory"
   | "prototypeStatus"
@@ -110,7 +110,7 @@ export interface ValidIdeaSubmission extends Omit<
   | "consentFeature"
   | "website"
 > {
-  domain: IdeaDomain;
+  domain: ProjectDomain;
   productCategory: ProductCategory;
   prototypeStatus: PrototypeStatus;
   teamStatus: TeamStatus;
@@ -122,12 +122,12 @@ export interface ValidIdeaSubmission extends Omit<
   consentFeature: true;
 }
 
-export type IdeaFieldErrors = Partial<Record<keyof IdeaDraft, string>>;
+export type SubmissionFieldErrors = Partial<Record<keyof SubmissionDraft, string>>;
 export type ValidationResult =
-  | { ok: true; value: ValidIdeaSubmission }
-  | { ok: false; fieldErrors: IdeaFieldErrors };
+  | { ok: true; value: ValidSubmission }
+  | { ok: false; fieldErrors: SubmissionFieldErrors };
 
-export const EMPTY_IDEA_DRAFT: IdeaDraft = {
+export const EMPTY_SUBMISSION_DRAFT: SubmissionDraft = {
   fullName: "",
   usn: "",
   email: "",

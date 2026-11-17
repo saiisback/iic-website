@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { HomeNavigation } from "./HomeNavigation.ts";
 
-test("renders the Events, Gallery, Idea Box and Careers links beneath Lock In", () => {
+test("renders the Events, Gallery, Who's Building and Careers links beneath Lock In", () => {
   const markup = renderToStaticMarkup(HomeNavigation());
 
   assert.match(
@@ -14,12 +14,15 @@ test("renders the Events, Gallery, Idea Box and Careers links beneath Lock In", 
   assert.match(markup, /<ul[^>]*class="[^"]*flex-col[^"]*"/);
   assert.deepEqual(
     [...markup.matchAll(/<a[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)].map(
-      ([, href, inner]) => ({ href, label: inner.replace(/<[^>]+>/g, "") }),
+      ([, href, inner]) => ({
+        href,
+        label: inner.replace(/<[^>]+>/g, "").replace(/&#x27;/g, "'"),
+      }),
     ),
     [
       { href: "/events", label: "Events" },
       { href: "/gallery", label: "Gallery" },
-      { href: "/idea-box", label: "Idea Box" },
+      { href: "/whos-building", label: "Who's Building" },
       { href: "/careers", label: "Careers" },
     ],
   );

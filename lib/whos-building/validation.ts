@@ -1,21 +1,21 @@
 import {
   COLLABORATOR_CHOICES,
-  IDEA_DOMAINS,
+  PROJECT_DOMAINS,
   PRODUCT_CATEGORIES,
   PROTOTYPE_STATUSES,
   SUPPORT_OPTIONS,
   TEAM_SIZES,
   TEAM_STATUSES,
   type CollaboratorChoice,
-  type IdeaDomain,
-  type IdeaDraft,
-  type IdeaFieldErrors,
+  type ProjectDomain,
+  type SubmissionDraft,
+  type SubmissionFieldErrors,
   type ProductCategory,
   type PrototypeStatus,
   type SupportNeed,
   type TeamSize,
   type TeamStatus,
-  type ValidIdeaSubmission,
+  type ValidSubmission,
   type ValidationResult,
 } from "./types";
 
@@ -23,7 +23,7 @@ const USN_PATTERN = /^[A-Z0-9-]{6,20}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_PATTERN = /^\+?[0-9][0-9\s()-]{5,24}$/;
 
-function readString(input: Record<string, unknown>, key: keyof IdeaDraft): string {
+function readString(input: Record<string, unknown>, key: keyof SubmissionDraft): string {
   const value = input[key];
   return typeof value === "string" ? value.trim() : "";
 }
@@ -58,15 +58,15 @@ function isValidPhone(value: string): boolean {
 
 function checkOptionalUrl(
   value: string,
-  errors: IdeaFieldErrors,
-  field: keyof IdeaDraft,
+  errors: SubmissionFieldErrors,
+  field: keyof SubmissionDraft,
 ): void {
   if (value.length > 500 || !isHttpUrl(value)) {
     errors[field] = "Enter a valid HTTP or HTTPS URL (or leave it empty).";
   }
 }
 
-export function validateIdeaSubmission(input: unknown): ValidationResult {
+export function validateSubmission(input: unknown): ValidationResult {
   const source =
     typeof input === "object" && input !== null && !Array.isArray(input)
       ? (input as Record<string, unknown>)
@@ -102,7 +102,7 @@ export function validateIdeaSubmission(input: unknown): ValidationResult {
   const supportNeeds = [...new Set(submittedSupportNeeds)].filter(
     (value): value is string => typeof value === "string",
   );
-  const errors: IdeaFieldErrors = {};
+  const errors: SubmissionFieldErrors = {};
 
   // 01. Builder information
   if (!hasLength(fullName, 2, 80)) errors.fullName = "Enter a name between 2 and 80 characters.";
@@ -113,7 +113,7 @@ export function validateIdeaSubmission(input: unknown): ValidationResult {
 
   // 02. Project classification
   if (!hasLength(projectName, 2, 120)) errors.projectName = "Enter a project name between 2 and 120 characters.";
-  if (!isMember(IDEA_DOMAINS, domain)) errors.domain = "Choose a valid domain.";
+  if (!isMember(PROJECT_DOMAINS, domain)) errors.domain = "Choose a valid domain.";
   if (!isMember(PRODUCT_CATEGORIES, productCategory)) errors.productCategory = "Choose a product category.";
 
   // 03-04. Problem and product
@@ -172,7 +172,7 @@ export function validateIdeaSubmission(input: unknown): ValidationResult {
       portfolioUrl,
       phone,
       projectName,
-      domain: domain as IdeaDomain,
+      domain: domain as ProjectDomain,
       productCategory: productCategory as ProductCategory,
       problem,
       solution,
@@ -194,6 +194,6 @@ export function validateIdeaSubmission(input: unknown): ValidationResult {
       consentReview: true,
       consentShare: true,
       consentFeature: true,
-    } satisfies ValidIdeaSubmission,
+    } satisfies ValidSubmission,
   };
 }

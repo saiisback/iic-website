@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { validateIdeaSubmission } from "./validation.ts";
+import { validateSubmission } from "./validation.ts";
 
 const validSubmission = {
   fullName: "  Sai Karthik  ",
@@ -36,7 +36,7 @@ const validSubmission = {
 };
 
 test("accepts a complete submission and cleans it up", () => {
-  const result = validateIdeaSubmission(validSubmission);
+  const result = validateSubmission(validSubmission);
 
   assert.equal(result.ok, true);
   if (result.ok) {
@@ -53,7 +53,7 @@ test("accepts a complete submission and cleans it up", () => {
 });
 
 test("accepts the submission when everything optional is left empty", () => {
-  const result = validateIdeaSubmission({
+  const result = validateSubmission({
     ...validSubmission,
     portfolioUrl: "",
     githubUrl: "",
@@ -69,7 +69,7 @@ test("accepts the submission when everything optional is left empty", () => {
 });
 
 test("flags every required field when the form is empty", () => {
-  const result = validateIdeaSubmission({});
+  const result = validateSubmission({});
 
   assert.equal(result.ok, false);
   if (!result.ok) {
@@ -109,21 +109,21 @@ test("rejects a phone number that is not a real phone number", () => {
   ] as const;
 
   for (const phone of cases) {
-    const result = validateIdeaSubmission({ ...validSubmission, phone });
+    const result = validateSubmission({ ...validSubmission, phone });
     assert.equal(result.ok, false);
     if (!result.ok) assert.ok(result.fieldErrors.phone);
   }
 });
 
 test("rejects a link that is not a real web address", () => {
-  const result = validateIdeaSubmission({ ...validSubmission, githubUrl: "ftp://example.com" });
+  const result = validateSubmission({ ...validSubmission, githubUrl: "ftp://example.com" });
 
   assert.equal(result.ok, false);
   if (!result.ok) assert.ok(result.fieldErrors.githubUrl);
 });
 
 test("asks for the skills you need when you want collaborators", () => {
-  const result = validateIdeaSubmission({
+  const result = validateSubmission({
     ...validSubmission,
     lookingForCollaborators: "Yes",
     collaboratorNeeds: "",
@@ -134,7 +134,7 @@ test("asks for the skills you need when you want collaborators", () => {
 });
 
 test("accepts an empty skills answer when you don't want collaborators", () => {
-  const result = validateIdeaSubmission({
+  const result = validateSubmission({
     ...validSubmission,
     lookingForCollaborators: "No",
     collaboratorNeeds: "",
@@ -153,7 +153,7 @@ test("rejects answers that only exist in the option lists", () => {
   ] as const;
 
   for (const [field, value] of cases) {
-    const result = validateIdeaSubmission({ ...validSubmission, [field]: value });
+    const result = validateSubmission({ ...validSubmission, [field]: value });
     assert.equal(result.ok, false);
     if (!result.ok) assert.ok(result.fieldErrors[field], `no error for ${field}`);
   }
@@ -161,21 +161,21 @@ test("rejects answers that only exist in the option lists", () => {
 
 test("requires all three consent boxes, one by one", () => {
   for (const field of ["consentReview", "consentShare", "consentFeature"] as const) {
-    const result = validateIdeaSubmission({ ...validSubmission, [field]: false });
+    const result = validateSubmission({ ...validSubmission, [field]: false });
     assert.equal(result.ok, false);
     if (!result.ok) assert.ok(result.fieldErrors[field]);
   }
 });
 
 test("rejects support options that are not on the list", () => {
-  const result = validateIdeaSubmission({ ...validSubmission, supportNeeds: ["Free pizza"] });
+  const result = validateSubmission({ ...validSubmission, supportNeeds: ["Free pizza"] });
 
   assert.equal(result.ok, false);
   if (!result.ok) assert.ok(result.fieldErrors.supportNeeds);
 });
 
 test("blocks bots that fill the hidden website field", () => {
-  const result = validateIdeaSubmission({ ...validSubmission, website: "bot" });
+  const result = validateSubmission({ ...validSubmission, website: "bot" });
 
   assert.equal(result.ok, false);
   if (!result.ok) assert.ok(result.fieldErrors.website);
@@ -185,8 +185,8 @@ test("never throws, whatever you send it", () => {
   const weirdInputs = [null, undefined, "string", 42, [], { supportNeeds: "yes" }, { supportNeeds: [1, 2] }];
 
   for (const input of weirdInputs) {
-    assert.doesNotThrow(() => validateIdeaSubmission(input));
-    const result = validateIdeaSubmission(input);
+    assert.doesNotThrow(() => validateSubmission(input));
+    const result = validateSubmission(input);
     assert.equal(result.ok, false);
   }
 });

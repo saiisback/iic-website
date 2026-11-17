@@ -4,17 +4,17 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import {
   COLLABORATOR_CHOICES,
-  EMPTY_IDEA_DRAFT,
-  IDEA_DOMAINS,
+  EMPTY_SUBMISSION_DRAFT,
+  PROJECT_DOMAINS,
   PRODUCT_CATEGORIES,
   PROTOTYPE_STATUSES,
   SUPPORT_OPTIONS,
   TEAM_SIZES,
   TEAM_STATUSES,
-  type IdeaDraft,
-  type IdeaFieldErrors,
-} from "@/lib/ideas/types";
-import { validateIdeaSubmission } from "@/lib/ideas/validation";
+  type SubmissionDraft,
+  type SubmissionFieldErrors,
+} from "@/lib/whos-building/types";
+import { validateSubmission } from "@/lib/whos-building/validation";
 
 const inputClass =
   "min-h-12 w-full border border-white/25 bg-white/[0.035] px-4 py-3 text-base text-white outline-none transition-[border-color,background-color] placeholder:text-white/38 hover:border-white/45 focus:border-emerald-400 focus:bg-white/[0.06]";
@@ -211,16 +211,16 @@ function TextInput({
   );
 }
 
-export function IdeaBoxForm() {
-  const [draft, setDraft] = useState<IdeaDraft>(() => ({
-    ...EMPTY_IDEA_DRAFT,
+export function WhosBuildingForm() {
+  const [draft, setDraft] = useState<SubmissionDraft>(() => ({
+    ...EMPTY_SUBMISSION_DRAFT,
     supportNeeds: [],
   }));
-  const [fieldErrors, setFieldErrors] = useState<IdeaFieldErrors>({});
+  const [fieldErrors, setFieldErrors] = useState<SubmissionFieldErrors>({});
   const [status, setStatus] = useState<FormStatus>("idle");
   const [formError, setFormError] = useState("");
 
-  const clearError = (field: keyof IdeaDraft) => {
+  const clearError = (field: keyof SubmissionDraft) => {
     setFieldErrors((current) => {
       if (!current[field]) return current;
       const next = { ...current };
@@ -229,7 +229,7 @@ export function IdeaBoxForm() {
     });
   };
 
-  const updateField = <K extends keyof IdeaDraft>(field: K, value: IdeaDraft[K]) => {
+  const updateField = <K extends keyof SubmissionDraft>(field: K, value: SubmissionDraft[K]) => {
     setDraft((current) => ({ ...current, [field]: value }));
     clearError(field);
     setFormError("");
@@ -253,7 +253,7 @@ export function IdeaBoxForm() {
     event.preventDefault();
     if (status === "submitting") return;
 
-    const validation = validateIdeaSubmission(draft);
+    const validation = validateSubmission(draft);
     if (!validation.ok) {
       setFieldErrors(validation.fieldErrors);
       setStatus("error");
@@ -268,7 +268,7 @@ export function IdeaBoxForm() {
     setFormError("");
 
     try {
-      const response = await fetch("/api/ideas", {
+      const response = await fetch("/api/whos-building", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(draft),
@@ -277,7 +277,7 @@ export function IdeaBoxForm() {
         ok?: boolean;
         submissionId?: unknown;
         error?: string;
-        fieldErrors?: IdeaFieldErrors;
+        fieldErrors?: SubmissionFieldErrors;
       };
 
       if (response.status === 400 && payload.error === "validation_failed") {
@@ -291,7 +291,7 @@ export function IdeaBoxForm() {
       }
 
       if (response.ok && payload.ok && typeof payload.submissionId === "string") {
-        setDraft({ ...EMPTY_IDEA_DRAFT, supportNeeds: [] });
+        setDraft({ ...EMPTY_SUBMISSION_DRAFT, supportNeeds: [] });
         setStatus("success");
         return;
       }
@@ -306,7 +306,7 @@ export function IdeaBoxForm() {
   if (status === "success") {
     return (
       <section className="border border-emerald-400/70 bg-emerald-400/[0.06] p-7 text-white md:p-10" aria-live="polite">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-emerald-300">Idea received</p>
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-emerald-300">Submission received</p>
         <h2 className="mt-5 text-4xl font-medium tracking-tight">Thanks for sharing your build.</h2>
         <p className="mt-4 max-w-lg text-base leading-7 text-white/65">
           The IIC team will review your idea and reach out to you on your college email.
@@ -352,7 +352,7 @@ export function IdeaBoxForm() {
         <SectionHeading number="02" title="Project classification" copy="Tell us what you're building." />
         <div className="space-y-6">
           <TextInput id="projectName" label="Project name" maxLength={120} placeholder="Give your build a clear name" value={draft.projectName} error={fieldErrors.projectName} onChange={(value) => updateField("projectName", value)} />
-          <SelectInput id="domain" label="Primary domain / sector" placeholder="Select a domain" value={draft.domain} error={fieldErrors.domain} errorId="domain-error" options={IDEA_DOMAINS} onChange={(value) => updateField("domain", value)} />
+          <SelectInput id="domain" label="Primary domain / sector" placeholder="Select a domain" value={draft.domain} error={fieldErrors.domain} errorId="domain-error" options={PROJECT_DOMAINS} onChange={(value) => updateField("domain", value)} />
           <RadioCards label="Product category" name="productCategory" columns="grid-cols-2 sm:grid-cols-3" value={draft.productCategory} error={fieldErrors.productCategory} errorId="productCategory-error" options={PRODUCT_CATEGORIES} onChange={(value) => updateField("productCategory", value)} />
         </div>
       </fieldset>

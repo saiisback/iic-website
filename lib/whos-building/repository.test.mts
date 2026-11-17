@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { saveIdeaSubmission, type RepositoryDependencies } from "./repository.ts";
-import { validateIdeaSubmission } from "./validation.ts";
+import { saveSubmission, type RepositoryDependencies } from "./repository.ts";
+import { validateSubmission } from "./validation.ts";
 
 const validSubmission = {
   fullName: "Sai Karthik",
@@ -45,11 +45,11 @@ test("saves the submission and hands back the new id", async () => {
     },
   };
 
-  const validation = validateIdeaSubmission(validSubmission);
+  const validation = validateSubmission(validSubmission);
   assert.equal(validation.ok, true);
   if (!validation.ok) return;
 
-  const id = await saveIdeaSubmission(validation.value, dependencies);
+  const id = await saveSubmission(validation.value, dependencies);
 
   assert.equal(id, "test-id-1");
   assert.equal(saved.length, 1);
@@ -66,9 +66,9 @@ test("writes every column in the same order as the SQL", async () => {
     },
   };
 
-  const validation = validateIdeaSubmission(validSubmission);
+  const validation = validateSubmission(validSubmission);
   if (!validation.ok) throw new Error("fixture should be valid");
-  await saveIdeaSubmission(validation.value, dependencies);
+  await saveSubmission(validation.value, dependencies);
 
   assert.ok(captured);
   const columns = captured.query.match(/INSERT INTO whos_building_submissions \(([\s\S]*?)\)/)?.[1]
@@ -104,7 +104,7 @@ test("writes every column in the same order as the SQL", async () => {
   assert.equal(byColumn.consent_feature, true);
 });
 
-test("writes into the new table, never the old Idea Box one", async () => {
+test("writes into the new table, never the old old idea_submissions table", async () => {
   let queryText = "";
   const dependencies: RepositoryDependencies = {
     createId: () => "test-id-4",
@@ -114,9 +114,9 @@ test("writes into the new table, never the old Idea Box one", async () => {
     },
   };
 
-  const validation = validateIdeaSubmission(validSubmission);
+  const validation = validateSubmission(validSubmission);
   if (!validation.ok) throw new Error("fixture should be valid");
-  await saveIdeaSubmission(validation.value, dependencies);
+  await saveSubmission(validation.value, dependencies);
 
   assert.match(queryText, /INSERT INTO whos_building_submissions/);
   assert.doesNotMatch(queryText, /idea_submissions/);
@@ -132,9 +132,9 @@ test("leaves empty optional links as database nulls", async () => {
     },
   };
 
-  const validation = validateIdeaSubmission({ ...validSubmission, demoUrl: "", websiteUrl: "", pitchDeckUrl: "" });
+  const validation = validateSubmission({ ...validSubmission, demoUrl: "", websiteUrl: "", pitchDeckUrl: "" });
   if (!validation.ok) throw new Error("fixture should be valid");
-  await saveIdeaSubmission(validation.value, dependencies);
+  await saveSubmission(validation.value, dependencies);
 
   assert.deepEqual([captured[23], captured[24], captured[25]], [null, null, null]);
 });

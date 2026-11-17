@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { neon } from "@neondatabase/serverless";
-import type { ValidIdeaSubmission } from "./types";
+import type { ValidSubmission } from "./types";
 
 export type QueryExecutor = (
   query: string,
@@ -37,8 +37,8 @@ function createDefaultQuery(): QueryExecutor {
   return (query, params) => sql.query(query, [...params]);
 }
 
-export async function saveIdeaSubmission(
-  value: ValidIdeaSubmission,
+export async function saveSubmission(
+  value: ValidSubmission,
   dependencies: RepositoryDependencies = {},
 ): Promise<string> {
   const id = (dependencies.createId ?? randomUUID)();

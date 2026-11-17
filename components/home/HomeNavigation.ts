@@ -5,7 +5,7 @@ const navigationItems = [
   { href: "/events", label: "Events" },
   { href: "/gallery", label: "Gallery" },
   // { href: "#team", label: "Team" },
-  { href: "/idea-box", label: "Idea Box" },
+  { href: "/whos-building", label: "Who's Building" },
   { href: "/careers", label: "Careers", highlight: RECRUITMENT_OPEN },
 ] as const;
 

@@ -1,9 +1,11 @@
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { neon } from "@neondatabase/serverless";
 
-async function applyMigration() {
+const MIGRATIONS_DIR = resolve("db/migrations");
+
+async function applyMigrations() {
   if (existsSync(resolve(".env.local"))) {
     process.loadEnvFile(resolve(".env.local"));
   }
@@ -11,25 +13,29 @@ async function applyMigration() {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) throw new Error("Missing database URL");
 
-  const migration = await readFile(
-    resolve("db/migrations/001_create_idea_submissions.sql"),
-    "utf8",
-  );
-  const statements = migration
-    .split(/\r?\n-- migrate:split\r?\n/)
-    .map((statement) => statement.trim())
-    .filter(Boolean);
+  const files = readdirSync(MIGRATIONS_DIR)
+    .filter((file) => file.endsWith(".sql"))
+    .sort();
   const sql = neon(connectionString);
 
-  for (const statement of statements) {
-    await sql.query(statement);
+  for (const file of files) {
+    const migration = await readFile(resolve(MIGRATIONS_DIR, file), "utf8");
+    const statements = migration
+      .split(/\r?\n-- migrate:split\r?\n/)
+      .map((statement) => statement.trim())
+      .filter(Boolean);
+
+    for (const statement of statements) {
+      await sql.query(statement);
+    }
+    console.log(`Applied ${file}.`);
   }
 }
 
 try {
-  await applyMigration();
-  console.log("Applied idea_submissions migration.");
+  await applyMigrations();
+  console.log("All idea/career migrations applied.");
 } catch {
-  console.error("Unable to apply idea_submissions migration.");
+  console.error("Unable to apply migrations.");
   process.exitCode = 1;
 }

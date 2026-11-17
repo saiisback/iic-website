@@ -12,12 +12,21 @@ export interface RepositoryDependencies {
   createId?: () => string;
 }
 
-const INSERT_IDEA = `
-  INSERT INTO idea_submissions (
-    id, full_name, usn, email, project_name, summary, problem, solution,
-    domain, prototype_status, team_status, support_needs, project_url, consent
+const INSERT_SUBMISSION = `
+  INSERT INTO whos_building_submissions (
+    id, full_name, usn, email, portfolio_url, phone, project_name,
+    domain, product_category, problem, solution, prototype_status, traction,
+    team_status, team_size, team_roles, looking_for_collaborators, collaborator_needs,
+    business_potential, support_needs, next_milestone, funding_estimate,
+    github_url, demo_url, website_url, pitch_deck_url,
+    consent_review, consent_share, consent_feature
   ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+    $1, $2, $3, $4, $5, $6, $7,
+    $8, $9, $10, $11, $12, $13,
+    $14, $15, $16, $17, $18,
+    $19, $20, $21, $22,
+    $23, $24, $25, $26,
+    $27, $28, $29
   )
 `;
 
@@ -35,21 +44,36 @@ export async function saveIdeaSubmission(
   const id = (dependencies.createId ?? randomUUID)();
   const query = dependencies.query ?? createDefaultQuery();
 
-  await query(INSERT_IDEA, [
+  await query(INSERT_SUBMISSION, [
     id,
     value.fullName,
     value.usn,
     value.email,
+    value.portfolioUrl || null,
+    value.phone,
     value.projectName,
-    value.summary,
+    value.domain,
+    value.productCategory,
     value.problem,
     value.solution,
-    value.domain,
     value.prototypeStatus,
+    value.traction,
     value.teamStatus,
+    value.teamSize,
+    value.teamRoles,
+    value.lookingForCollaborators,
+    value.collaboratorNeeds || null,
+    value.businessPotential,
     JSON.stringify(value.supportNeeds),
-    value.projectUrl || null,
-    value.consent,
+    value.nextMilestone,
+    value.fundingEstimate || null,
+    value.githubUrl || null,
+    value.demoUrl || null,
+    value.websiteUrl || null,
+    value.pitchDeckUrl || null,
+    value.consentReview,
+    value.consentShare,
+    value.consentFeature,
   ]);
 
   return id;
